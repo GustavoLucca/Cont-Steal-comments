@@ -28,7 +28,7 @@ def main():
     parser.add_argument('--pretrain',default='cifar10',type=str)
     parser.add_argument('--target_dataset',default='cifar10',type=str)
     parser.add_argument('--surrogate_dataset',default='cifar10',type=str)
-    parser.add_argument('--steal',default='posterior',type=str) # Differentiates between stealing label, representation, and posterior. More optimizers used than cont-steal, which doesn't have posterior.
+    parser.add_argument('--steal',default='posterior',type=str) # Differentiates between stealing label, representation, and posterior. More optimizers used than cont-steal, which doesn't specify.
     parser.add_argument('--surrogate_model',default='resnet18',type=str)
     parser.add_argument('--split',default= 1,type= float ) # Splits the database.
     parser.add_argument('--epoch',default= 100, type = int)
@@ -39,7 +39,7 @@ def main():
     catagory_num = 10
     surrogate_model = Surrogate_model(catagory_num,args.surrogate_model).to(device)
     target_encoder,target_linear = load_target_model(args.model_type,args.pretrain,args.target_dataset)
-    train_dataset,test_dataset,linear_dataset = load_dataset(args.pretrain,args.target_dataset,args.surrogate_dataset,0,args.split) # When the database is loaded, it is split, unlike cont-steal. Prepares dataset for training and testing.
+    train_dataset,test_dataset,linear_dataset = load_dataset(args.pretrain,args.target_dataset,args.surrogate_dataset,0,args.split) # Prepares dataset for training and testing.
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
         batch_size=32,
