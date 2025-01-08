@@ -34,7 +34,7 @@ def main():
     parser.add_argument('--epoch',default= 100, type = int)
 
 
-    args = parser.parse_args()
+    args = parser.parse_args() # test
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     catagory_num = 10
     surrogate_model = Surrogate_model(catagory_num,args.surrogate_model).to(device)
