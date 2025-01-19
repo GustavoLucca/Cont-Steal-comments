@@ -8,7 +8,7 @@ from target_model import target_model
 from torchvision import transforms
 from Linear import linear
 from torchvision.transforms import transforms
-from RandAugment import RandAugment
+from randaugment import RandAugment
 from torch.utils.data import random_split
 
 
