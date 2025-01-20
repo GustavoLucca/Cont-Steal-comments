@@ -19,6 +19,7 @@ from Linear import linear
 import os
 from PIL import Image
 import requests
+from torchvision import models
 import timm # A couple of these imports are unused.
 
 def main():
@@ -38,7 +39,8 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     catagory_num = 10
     surrogate_model = Surrogate_model(catagory_num,args.surrogate_model).to(device)
-    target_encoder,target_linear = load_target_model(args.model_type,args.pretrain,args.target_dataset)
+    target_encoder = models.resnet18(pretrained=False).to(device)
+    target_linear = nn.Linear(512, num_classes).to(device)
     train_dataset,test_dataset,linear_dataset = load_dataset(args.pretrain,args.target_dataset,args.surrogate_dataset,0,args.split) # Prepares dataset for training and testing.
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
