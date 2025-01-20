@@ -20,6 +20,7 @@ import os
 from PIL import Image
 import requests
 from torchvision import models
+import torch.nn as nn
 import timm # A couple of these imports are unused.
 
 def main():
@@ -40,6 +41,12 @@ def main():
     catagory_num = 10
     surrogate_model = Surrogate_model(catagory_num,args.surrogate_model).to(device)
     target_encoder = models.resnet18(pretrained=False).to(device)
+    if args.target_dataset == "cifar10":
+        num_classes = 10
+    elif args.target_dataset == "cifar100":
+        num_classes = 100
+    else:
+        raise ValueError(f"Unsupported dataset: {args.target_dataset}")
     target_linear = nn.Linear(512, num_classes).to(device)
     train_dataset,test_dataset,linear_dataset = load_dataset(args.pretrain,args.target_dataset,args.surrogate_dataset,0,args.split) # Prepares dataset for training and testing.
     train_loader = torch.utils.data.DataLoader(
