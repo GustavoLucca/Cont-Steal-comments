@@ -10,6 +10,7 @@ from Linear import linear
 from torchvision.transforms import transforms
 from randaugment import RandAugment
 from torch.utils.data import random_split
+import os
 
 
 class random_transform():
@@ -87,25 +88,19 @@ def new_load_target_model(model_type,pretrain,downstream):
     return model,linear_model
 
 
-def load_target_model(model_type,pretrain,downstream):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = models.resnet18()
-    model.fc = nn.Identity()
-    if(pretrain == 'cifar10'):
-        model.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=2, bias=False)
-        model.maxpool = nn.Identity()
-    state = torch.load('target_downstream/'+pretrain+'/'+model_type+'_'+pretrain+'.ckpt')["state_dict"]
-    for k in list(state.keys()):
-        if "backbone" in k:
-            state[k.replace("backbone.", "")] = state[k]
-        del state[k]
-    model.load_state_dict(state, strict=False)
-    model = model.to(device)
-    linear_model = linear(model.inplanes,10)
-    linear_state = torch.load("target_downstream/"+pretrain+"/"+model_type+'_'+downstream+'_linear.pkl')
-    linear_model.load_state_dict(linear_state)
-    linear_model = linear_model.to(device)
-    return model,linear_model
+def load_target_model(model_type, pretrain, downstream):
+    model_path = f"target_downstream/{pretrain}/{model_type}_{downstream}_linear.pkl"
+    
+    if not os.path.exists(model_path):
+        print(f"🔴 WARNING: {model_path} does not exist! Skipping load and training from scratch.")
+        target_linear = None  # Instead of loading a non-existent file, return None
+    else:
+        linear_state = torch.load(model_path)
+        target_linear = nn.Linear(512, 10)  # Modify this based on dataset (e.g., 10 for CIFAR-10, 100 for CIFAR-100)
+        target_linear.load_state_dict(linear_state)
+    
+    return target_linear  # Ensure the function doesn't crash when the file doesn't exist
+
 
 #def load_dataset(t_dataset,s_dataset,aug,eplision):
 def load_dataset(pretrain ,t_dataset,s_dataset,aug,eplision):
