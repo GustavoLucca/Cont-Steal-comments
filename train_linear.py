@@ -19,7 +19,11 @@ parser.add_argument('--topk',default=512,type = int)
 parser.add_argument('--round_size',default=0,type = int)
 args = parser.parse_args()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-target_encoder,target_linear = load_target_model(args.model_type,args.encoder_dataset,args.classifier_dataset)
+target_encoder = load_target_model(args.model_type, args.encoder_dataset, args.classifier_dataset)
+if target_encoder is None:
+    print("🔴 ERROR: target_encoder failed to load. Initializing ResNet18 from scratch.")
+    target_encoder = torchvision.models.resnet18(pretrained=False).to(device)
+    target_encoder.fc = torch.nn.Identity()  # Remove final classification layer
 if(args.classifier_dataset == 'cifar100'):
     num = 100
 else:
