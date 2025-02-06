@@ -10,7 +10,7 @@ class target_model(nn.Module):
         self.encoder = torchvision.models.resnet18(pretrained=False)
         self.encoder.fc = nn.Identity()
         self.out_dim = out_dim
-        self.linear = nn.Linear(self.encoder.fc.out_features,self.out_dim)
+        self.linear = nn.Linear(512,self.out_dim)
 
     def forward(self,x):
         x = self.encoder(x)
